@@ -23,7 +23,7 @@ export function readingTime(text: string): number {
 
 export function stripFrontmatter(content: string): string {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-  return match ? match[2] : content;
+  return match ? match[2].replace(/^\n+/, '') : content;
 }
 
 export function escapeHtml(str: string): string {

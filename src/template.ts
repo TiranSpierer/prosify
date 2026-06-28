@@ -10,7 +10,12 @@ interface RenderOptions {
   nextPage?: Page;
 }
 
-function renderSidebar(navigation: NavGroup[], currentSlug: string, pages: Page[]): string {
+function getBase(config: ProsifyConfig): string {
+  const b = config.basePath || '';
+  return b.endsWith('/') ? b.slice(0, -1) : b;
+}
+
+function renderSidebar(navigation: NavGroup[], currentSlug: string, pages: Page[], base: string): string {
   let html = '';
   for (const group of navigation) {
     html += `<div class="nav-group">`;
@@ -20,7 +25,7 @@ function renderSidebar(navigation: NavGroup[], currentSlug: string, pages: Page[
       const page = pages.find((p) => p.slug === slug);
       if (!page) continue;
       const active = page.slug === currentSlug ? ' active' : '';
-      html += `<li><a href="/${page.slug}" class="nav-link${active}">${escapeHtml(page.title)}</a></li>`;
+      html += `<li><a href="${base}/${page.slug}" class="nav-link${active}">${escapeHtml(page.title)}</a></li>`;
     }
     html += `</ul></div>`;
   }
@@ -38,16 +43,16 @@ function renderToc(headings: Heading[]): string {
   return html;
 }
 
-function renderPrevNext(prev?: Page, next?: Page): string {
+function renderPrevNext(prev: Page | undefined, next: Page | undefined, base: string): string {
   if (!prev && !next) return '';
   let html = '<nav class="prev-next">';
   if (prev) {
-    html += `<a href="/${prev.slug}" class="prev-next-link prev"><span class="prev-next-label">Previous</span><span class="prev-next-title">${escapeHtml(prev.title)}</span></a>`;
+    html += `<a href="${base}/${prev.slug}" class="prev-next-link prev"><span class="prev-next-label">Previous</span><span class="prev-next-title">${escapeHtml(prev.title)}</span></a>`;
   } else {
     html += '<span></span>';
   }
   if (next) {
-    html += `<a href="/${next.slug}" class="prev-next-link next"><span class="prev-next-label">Next</span><span class="prev-next-title">${escapeHtml(next.title)}</span></a>`;
+    html += `<a href="${base}/${next.slug}" class="prev-next-link next"><span class="prev-next-label">Next</span><span class="prev-next-title">${escapeHtml(next.title)}</span></a>`;
   }
   html += '</nav>';
   return html;
@@ -58,6 +63,7 @@ export function renderPage(options: RenderOptions): string {
   const primary = config.theme?.primary || '#3b82f6';
   const siteName = escapeHtml(config.name);
   const pageTitle = escapeHtml(page.title);
+  const base = getBase(config);
 
   return `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
@@ -66,8 +72,8 @@ export function renderPage(options: RenderOptions): string {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${pageTitle} - ${siteName}</title>
   <meta name="description" content="${escapeHtml(page.description || config.description || '')}">
-  <link rel="alternate" type="text/markdown" href="/${page.slug}.md">
-  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="alternate" type="text/markdown" href="${base}/${page.slug}.md">
+  <link rel="stylesheet" href="${base}/assets/style.css">
   <style>:root { --color-primary: ${primary}; --color-primary-light: ${primary}22; }</style>
 </head>
 <body>
@@ -76,7 +82,7 @@ export function renderPage(options: RenderOptions): string {
       <button class="menu-toggle" aria-label="Toggle menu">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
       </button>
-      <a href="/" class="site-title">${config.logo ? `<img src="${config.logo}" alt="" class="site-logo">` : ''}${siteName}</a>
+      <a href="${base}/" class="site-title">${config.logo ? `<img src="${config.logo}" alt="" class="site-logo">` : ''}${siteName}</a>
       <div class="header-actions">
         <button class="search-trigger" aria-label="Search" title="Search (Ctrl+K)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -90,7 +96,7 @@ export function renderPage(options: RenderOptions): string {
     </header>
 
     <aside class="sidebar">
-      ${renderSidebar(navigation, page.slug, pages)}
+      ${renderSidebar(navigation, page.slug, pages, base)}
     </aside>
 
     <main class="content">
@@ -102,7 +108,7 @@ export function renderPage(options: RenderOptions): string {
         <div class="prose">
           ${page.htmlContent}
         </div>
-        ${renderPrevNext(prevPage, nextPage)}
+        ${renderPrevNext(prevPage, nextPage, base)}
       </article>
     </main>
 
@@ -125,7 +131,8 @@ export function renderPage(options: RenderOptions): string {
 
   ${config.footer ? `<footer class="footer">${escapeHtml(config.footer)}</footer>` : ''}
 
-  <script src="/assets/script.js"></script>
+  <script>window.__PROSIFY_BASE__="${base}";</script>
+  <script src="${base}/assets/script.js"></script>
 </body>
 </html>`;
 }
@@ -134,7 +141,7 @@ export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation:
   const siteName = escapeHtml(config.name);
   const desc = escapeHtml(config.description || '');
   const primary = config.theme?.primary || '#3b82f6';
-  const firstPage = pages[0];
+  const base = getBase(config);
 
   let navHtml = '';
   for (const group of navigation) {
@@ -142,7 +149,7 @@ export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation:
     for (const slug of group.pages) {
       const page = pages.find((p) => p.slug === slug);
       if (!page) continue;
-      navHtml += `<li><a href="/${page.slug}">${escapeHtml(page.title)}</a>${page.description ? `<p>${escapeHtml(page.description)}</p>` : ''}</li>`;
+      navHtml += `<li><a href="${base}/${page.slug}">${escapeHtml(page.title)}</a>${page.description ? `<p>${escapeHtml(page.description)}</p>` : ''}</li>`;
     }
     navHtml += '</ul></div>';
   }
@@ -154,7 +161,7 @@ export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation:
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${siteName}</title>
   <meta name="description" content="${desc}">
-  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="${base}/assets/style.css">
   <style>:root { --color-primary: ${primary}; --color-primary-light: ${primary}22; }</style>
 </head>
 <body>
@@ -167,7 +174,8 @@ export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation:
       ${navHtml}
     </div>
   </div>
-  <script src="/assets/script.js"></script>
+  <script>window.__PROSIFY_BASE__="${base}";</script>
+  <script src="${base}/assets/script.js"></script>
 </body>
 </html>`;
 }

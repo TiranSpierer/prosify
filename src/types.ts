@@ -2,6 +2,7 @@ export interface ProsifyConfig {
   name: string;
   description: string;
   url?: string;
+  basePath?: string;
   logo?: string;
   navigation?: NavGroup[];
   theme?: ThemeConfig;
@@ -54,6 +55,7 @@ export interface BuildOptions {
   outDir: string;
   configPath?: string;
   baseUrl?: string;
+  basePath?: string;
 }
 
 export interface SearchEntry {

@@ -1,6 +1,8 @@
 (function() {
   'use strict';
 
+  var BASE = window.__PROSIFY_BASE__ || '';
+
   // Theme
   const html = document.documentElement;
   const stored = localStorage.getItem('prosify-theme');
@@ -105,7 +107,7 @@
     if (searchIndex) return;
     try {
       const [indexData, ms] = await Promise.all([
-        fetch('/assets/search-index.json').then((r) => r.json()),
+        fetch(BASE + '/assets/search-index.json').then((r) => r.json()),
         import('https://cdn.jsdelivr.net/npm/minisearch@7/dist/es/index.min.js').then((m) => m.default || m),
       ]);
       MiniSearch = ms;
@@ -129,7 +131,7 @@
         return;
       }
       searchResults.innerHTML = results.map((r) =>
-        `<a href="/${r.slug}" class="search-result"><div class="search-result-title">${escapeHtml(r.title)}</div>${r.description ? `<div class="search-result-desc">${escapeHtml(r.description)}</div>` : ''}</a>`
+        `<a href="${BASE}/${r.slug}" class="search-result"><div class="search-result-title">${escapeHtml(r.title)}</div>${r.description ? `<div class="search-result-desc">${escapeHtml(r.description)}</div>` : ''}</a>`
       ).join('');
     });
   }

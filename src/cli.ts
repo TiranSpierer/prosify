@@ -13,12 +13,14 @@ cli
   .option('--config <path>', 'Config file path')
   .option('--out <path>', 'Output directory', { default: './dist/docs' })
   .option('--base <url>', 'Base URL for llms.txt links')
+  .option('--base-path <path>', 'URL path prefix (e.g. /docs) for subpath deployments')
   .action(async (options) => {
     await build({
       docsDir: resolve(options.docs),
       outDir: resolve(options.out),
       configPath: options.config,
       baseUrl: options.base,
+      basePath: options.basePath,
     });
   });
 

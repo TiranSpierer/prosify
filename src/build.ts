@@ -16,10 +16,11 @@ const THEME_DIR = resolve(__dirname, '../theme');
 
 export async function build(options: BuildOptions): Promise<void> {
   const startTime = Date.now();
-  const { docsDir, outDir, configPath, baseUrl } = options;
+  const { docsDir, outDir, configPath, baseUrl, basePath } = options;
 
   const config = loadConfig(configPath, docsDir);
   if (baseUrl) config.url = baseUrl;
+  if (basePath) config.basePath = basePath;
 
   const mdFiles = await fg('**/*.md', { cwd: resolve(docsDir), ignore: ['node_modules/**'] });
   if (mdFiles.length === 0) {
@@ -158,22 +159,23 @@ function getOrderedPages(navigation: NavGroup[], pages: Page[]): Page[] {
 
 function render404(config: ProsifyConfig): string {
   const primary = config.theme?.primary || '#3b82f6';
+  const base = (config.basePath || '').replace(/\/$/, '');
   return `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Not Found - ${config.name}</title>
-  <link rel="stylesheet" href="/assets/style.css">
+  <link rel="stylesheet" href="${base}/assets/style.css">
   <style>:root { --color-primary: ${primary}; }</style>
 </head>
 <body>
   <div class="home" style="text-align:center;padding-top:15vh">
     <h1 style="font-size:4rem;opacity:.3">404</h1>
     <p style="margin-top:1rem;color:var(--color-text-muted)">Page not found</p>
-    <a href="/" style="display:inline-block;margin-top:2rem;color:var(--color-primary)">← Back to docs</a>
+    <a href="${base}/" style="display:inline-block;margin-top:2rem;color:var(--color-primary)">← Back to docs</a>
   </div>
-  <script src="/assets/script.js"></script>
+  <script src="${base}/assets/script.js"></script>
 </body>
 </html>`;
 }

@@ -47,23 +47,52 @@ function renderPrevNext(prev: Page | undefined, next: Page | undefined, base: st
   if (!prev && !next) return '';
   let html = '<nav class="prev-next">';
   if (prev) {
-    html += `<a href="${base}/${prev.slug}" class="prev-next-link prev"><span class="prev-next-label">Previous</span><span class="prev-next-title">${escapeHtml(prev.title)}</span></a>`;
+    html += `<a href="${base}/${prev.slug}" class="prev-next-link prev"><span class="prev-next-label">← Previous</span><span class="prev-next-title">${escapeHtml(prev.title)}</span></a>`;
   } else {
     html += '<span></span>';
   }
   if (next) {
-    html += `<a href="${base}/${next.slug}" class="prev-next-link next"><span class="prev-next-label">Next</span><span class="prev-next-title">${escapeHtml(next.title)}</span></a>`;
+    html += `<a href="${base}/${next.slug}" class="prev-next-link next"><span class="prev-next-label">Next →</span><span class="prev-next-title">${escapeHtml(next.title)}</span></a>`;
   }
   html += '</nav>';
   return html;
 }
 
+function renderPageActions(): string {
+  return `<div class="page-actions">
+      <button class="page-actions-btn" aria-label="Page actions">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      </button>
+      <div class="page-actions-dropdown">
+        <button data-action="copy-page">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy page</span>
+        </button>
+        <button data-action="copy-markdown">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span>Copy as Markdown</span>
+        </button>
+        <button data-action="open-markdown">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span>Open as Markdown</span>
+        </button>
+      </div>
+    </div>`;
+}
+
+function renderThemeStyles(config: ProsifyConfig): string {
+  const primary = config.theme?.primary || '#6366f1';
+  const accentLight = config.theme?.accentLight || primary;
+  const accentDark = config.theme?.accentDark || primary;
+  return `:root { --color-primary: ${primary}; --color-primary-light: ${primary}18; --color-accent-light: ${accentLight}; --color-accent-dark: ${accentDark}; }`;
+}
+
 export function renderPage(options: RenderOptions): string {
   const { page, config, pages, navigation, prevPage, nextPage } = options;
-  const primary = config.theme?.primary || '#3b82f6';
   const siteName = escapeHtml(config.name);
   const pageTitle = escapeHtml(page.title);
   const base = getBase(config);
+  const siteUrl = config.url ? config.url.replace(/\/$/, '') : '';
 
   return `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
@@ -74,7 +103,10 @@ export function renderPage(options: RenderOptions): string {
   <meta name="description" content="${escapeHtml(page.description || config.description || '')}">
   <link rel="alternate" type="text/markdown" href="${base}/${page.slug}.md">
   <link rel="stylesheet" href="${base}/assets/style.css">
-  <style>:root { --color-primary: ${primary}; --color-primary-light: ${primary}22; }</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>${renderThemeStyles(config)}</style>
 </head>
 <body>
   <div class="layout">
@@ -85,12 +117,12 @@ export function renderPage(options: RenderOptions): string {
       <a href="${base}/" class="site-title">${config.logo ? `<img src="${config.logo}" alt="" class="site-logo">` : ''}${siteName}</a>
       <div class="header-actions">
         <button class="search-trigger" aria-label="Search" title="Search (Ctrl+K)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          <span class="search-shortcut">Ctrl K</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span class="search-shortcut">⌘K</span>
         </button>
         <button class="theme-toggle" aria-label="Toggle theme">
-          <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-          <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
       </div>
     </header>
@@ -102,8 +134,11 @@ export function renderPage(options: RenderOptions): string {
     <main class="content">
       <article class="article">
         <div class="article-header">
-          <h1>${pageTitle}</h1>
-          ${page.readingTime ? `<span class="reading-time">${page.readingTime} min read</span>` : ''}
+          <div class="article-header-text">
+            <h1>${pageTitle}</h1>
+            ${page.readingTime ? `<span class="reading-time">${page.readingTime} min read</span>` : ''}
+          </div>
+          ${renderPageActions()}
         </div>
         <div class="prose">
           ${page.htmlContent}
@@ -116,6 +151,11 @@ export function renderPage(options: RenderOptions): string {
       ${renderToc(page.headings)}
     </aside>
   </div>
+
+  <!-- LLM-friendly: machine-readable reference to llms.txt -->
+  <blockquote class="llm-info" aria-hidden="true">
+    This documentation is available in machine-readable format at <a href="${base}/llms.txt">${siteUrl}${base}/llms.txt</a>
+  </blockquote>
 
   <div class="search-modal" role="dialog" aria-hidden="true">
     <div class="search-backdrop"></div>
@@ -140,8 +180,8 @@ export function renderPage(options: RenderOptions): string {
 export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation: NavGroup[]): string {
   const siteName = escapeHtml(config.name);
   const desc = escapeHtml(config.description || '');
-  const primary = config.theme?.primary || '#3b82f6';
   const base = getBase(config);
+  const siteUrl = config.url ? config.url.replace(/\/$/, '') : '';
 
   let navHtml = '';
   for (const group of navigation) {
@@ -162,7 +202,10 @@ export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation:
   <title>${siteName}</title>
   <meta name="description" content="${desc}">
   <link rel="stylesheet" href="${base}/assets/style.css">
-  <style>:root { --color-primary: ${primary}; --color-primary-light: ${primary}22; }</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>${renderThemeStyles(config)}</style>
 </head>
 <body>
   <div class="home">
@@ -174,6 +217,12 @@ export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation:
       ${navHtml}
     </div>
   </div>
+
+  <!-- LLM-friendly: machine-readable reference to llms.txt -->
+  <blockquote class="llm-info" aria-hidden="true">
+    This documentation is available in machine-readable format at <a href="${base}/llms.txt">${siteUrl}${base}/llms.txt</a>
+  </blockquote>
+
   <script>window.__PROSIFY_BASE__="${base}";</script>
   <script src="${base}/assets/script.js"></script>
 </body>

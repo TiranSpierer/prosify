@@ -5,7 +5,7 @@ import type { ProsifyConfig } from './types.js';
 const DEFAULT_CONFIG: ProsifyConfig = {
   name: 'Documentation',
   description: '',
-  theme: { primary: '#3b82f6', dark: true },
+  theme: { primary: '#6366f1', dark: true },
   llms: { full: true },
 };
 

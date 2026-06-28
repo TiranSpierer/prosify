@@ -14,18 +14,23 @@ export async function startDevServer(options: BuildOptions & { port?: number; op
   // Initial build
   await build(buildOpts);
 
+  // Determine base path from config for URL stripping in dev
+  const { loadConfig } = await import('./config.js');
+  const config = loadConfig(buildOpts.configPath, buildOpts.docsDir);
+  if (buildOpts.basePath) config.basePath = buildOpts.basePath;
+  const basePath = (config.basePath || '').replace(/\/$/, '');
+
   // Static file server
-  const serve = sirv(outDir, { single: false, dev: true });
+  const serve = sirv(outDir, { single: false, dev: true, extensions: ['html'] });
   const server = createServer((req, res) => {
-    // Handle WebSocket upgrade separately
     if (req.url === '/__prosify_ws') return;
+    // Strip basePath prefix so sirv can find files in outDir
+    if (basePath && req.url?.startsWith(basePath)) {
+      req.url = req.url.slice(basePath.length) || '/';
+    }
     serve(req, res, () => {
-      // Fallback: try serving index.html for clean URLs
-      const indexReq = { ...req, url: req.url + '/index.html' };
-      serve(indexReq as any, res, () => {
-        res.writeHead(404);
-        res.end('Not found');
-      });
+      res.writeHead(404);
+      res.end('Not found');
     });
   });
 

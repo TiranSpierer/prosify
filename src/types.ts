@@ -17,6 +17,8 @@ export interface NavGroup {
 
 export interface ThemeConfig {
   primary?: string;
+  accentLight?: string;
+  accentDark?: string;
   dark?: boolean;
 }
 

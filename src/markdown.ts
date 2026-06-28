@@ -58,7 +58,12 @@ export async function createMarkdownRenderer(): Promise<{
   });
 
   md.use(anchor, {
-    permalink: anchor.permalink.headerLink({ safariReaderFix: true }),
+    permalink: anchor.permalink.linkInsideHeader({
+      symbol: '#',
+      placement: 'before',
+      ariaHidden: true,
+      class: 'header-anchor',
+    }),
     slugify: (s: string) =>
       s.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-'),
   });

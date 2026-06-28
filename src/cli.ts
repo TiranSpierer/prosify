@@ -191,5 +191,5 @@ If no \`docs.json\` exists, prosify auto-discovers markdown files and generates 
   });
 
 cli.help();
-cli.version('0.1.1');
+cli.version('0.1.2');
 cli.parse();

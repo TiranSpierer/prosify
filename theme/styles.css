@@ -184,5 +184,5 @@ body{font-family:var(--font-sans);background:var(--color-bg);color:var(--color-t
 }
 
 /* Anchor links */
-.prose .header-anchor{opacity:0;text-decoration:none;color:var(--color-text-dim);margin-left:.25rem;transition:opacity .15s}
+.prose .header-anchor{opacity:0;text-decoration:none;color:var(--color-text-dim);margin-right:.25rem;font-weight:400;transition:opacity .15s}
 .prose h2:hover .header-anchor,.prose h3:hover .header-anchor,.prose h4:hover .header-anchor{opacity:1}

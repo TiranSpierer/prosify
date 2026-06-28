@@ -87,6 +87,13 @@ function renderThemeStyles(config: ProsifyConfig): string {
   return `:root { --color-primary: ${primary}; --color-primary-light: ${primary}18; --color-accent-light: ${accentLight}; --color-accent-dark: ${accentDark}; }`;
 }
 
+function renderAnalytics(config: ProsifyConfig): string {
+  if (!config.analytics?.script) return '';
+  const attrs = config.analytics.attrs || {};
+  const attrStr = Object.entries(attrs).map(([k, v]) => ` ${k}="${escapeHtml(v)}"`).join('');
+  return `<script defer src="${config.analytics.script}"${attrStr}></script>`;
+}
+
 export function renderPage(options: RenderOptions): string {
   const { page, config, pages, navigation, prevPage, nextPage } = options;
   const siteName = escapeHtml(config.name);
@@ -173,6 +180,7 @@ export function renderPage(options: RenderOptions): string {
 
   <script>window.__PROSIFY_BASE__="${base}";</script>
   <script src="${base}/assets/script.js"></script>
+  ${renderAnalytics(config)}
 </body>
 </html>`;
 }
@@ -225,6 +233,7 @@ export function renderHomepage(config: ProsifyConfig, pages: Page[], navigation:
 
   <script>window.__PROSIFY_BASE__="${base}";</script>
   <script src="${base}/assets/script.js"></script>
+  ${renderAnalytics(config)}
 </body>
 </html>`;
 }

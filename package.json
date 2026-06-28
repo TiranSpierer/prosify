@@ -1,6 +1,6 @@
 {
   "name": "prosify",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Static documentation site generator with llms.txt and per-page .md URLs baked in.",
   "type": "module",
   "main": "./dist/index.js",

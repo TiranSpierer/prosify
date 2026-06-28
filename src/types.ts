@@ -8,6 +8,7 @@ export interface ProsifyConfig {
   theme?: ThemeConfig;
   footer?: string;
   llms?: LlmsConfig;
+  analytics?: AnalyticsConfig;
 }
 
 export interface NavGroup {
@@ -20,6 +21,11 @@ export interface ThemeConfig {
   accentLight?: string;
   accentDark?: string;
   dark?: boolean;
+}
+
+export interface AnalyticsConfig {
+  script: string;
+  attrs?: Record<string, string>;
 }
 
 export interface LlmsConfig {

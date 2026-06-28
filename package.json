@@ -1,0 +1,59 @@
+{
+  "name": "prosify",
+  "version": "0.1.0",
+  "description": "Static documentation site generator with llms.txt and per-page .md URLs baked in.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "prosify": "./dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "theme"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "docs",
+    "documentation",
+    "static-site-generator",
+    "llms-txt",
+    "markdown",
+    "ai-friendly"
+  ],
+  "author": "Tiran Spierer",
+  "license": "MIT",
+  "dependencies": {
+    "cac": "^6.7.14",
+    "chokidar": "^4.0.3",
+    "fast-glob": "^3.3.3",
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "markdown-it-container": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "minisearch": "^7.1.1",
+    "shiki": "^3.2.1",
+    "sirv": "^3.0.1",
+    "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^22.10.5",
+    "@types/ws": "^8.5.13",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
